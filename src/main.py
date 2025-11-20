@@ -1,5 +1,6 @@
 from types import NoneType
-from typing import Union, Any, Callable
+from typing import Union
+
 
 def blackScholes(
     assetPrice: float,
@@ -11,7 +12,22 @@ def blackScholes(
     dividendYield: Union[str, NoneType],
 ) -> float:
 
-    print("Hello world")
+    # Input validation
+    if (
+        (
+            assetPrice
+            and strikePrice
+            and expiration
+            and riskFreeInterestRate
+            and volatility
+            and optionType
+            and dividendYield
+        )
+        > 0
+        and (optionType == str)
+        and (type(dividendYield) == str or NoneType)
+    ):
+        print("true")
 
 
 if __name__ == "__main__":
