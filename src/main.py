@@ -1,5 +1,6 @@
 from math import log, sqrt
 
+
 # convert input to dict
 def returnHashmap(optionInformation: list) -> dict:
     # validate float types for first 5 values
@@ -34,23 +35,32 @@ def returnHashmap(optionInformation: list) -> dict:
         "dividentYield": optionInformation[6],
     }
 
-## D1 standardized measure used in black-scholes 
+
+## D1 standardized measure used in black-scholes
+# d1 estimates the expected value of the stock relative to the strike, accounting for volatility and time.
 def d1Value(option: dict) -> float:
     # d1 = [ln(S/K) + (r + σ²/2) × T] / (σ × √T)
-    d1 = (log(option["assetPrice"]/option["strikePrice"]) + (option["riskFreeInterestRate"]+((option["volatility"]**2)/2)) * option["expiration"])/(option["volatility"]*sqrt(option["expiration"]))
+    d1 = (
+        log(option["assetPrice"] / option["strikePrice"])
+        + (option["riskFreeInterestRate"] + ((option["volatility"] ** 2) / 2))
+        * option["expiration"]
+    ) / (option["volatility"] * sqrt(option["expiration"]))
 
-    return 0.0
+    return d1
 
 
-## D2 standardized measure used in black-scholes 
-def d2Value() -> float:
-    return 0.0
+## D2 standardized measure used in black-scholes
+# d2 estimates the probability of exercise at expiration.
+def d2Value(option: dict, d1: float) -> float:
+    # d2 = d₁ - σ × √T
+    d2 = d1 - option["volatility"] * sqrt(option["expiration"])
+    return d2
 
 
 # Main black scholes function to calcualte price
 def blackScholesCalculator(option: dict) -> float:
     d1 = d1Value(option)
-    d2 = d2Value(option)
+    d2 = d2Value(option, d1)
 
     return 0.0
 
