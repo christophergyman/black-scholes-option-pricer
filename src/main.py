@@ -1,4 +1,5 @@
-from math import log, sqrt
+from math import log, sqrt, exp
+from scipy.stats import norm
 
 
 # convert input to dict
@@ -62,8 +63,19 @@ def blackScholesCalculator(option: dict) -> float:
     d1 = d1Value(option)
     d2 = d2Value(option, d1)
 
-    return 0.0
-
+    if option["optionType"] == "Call":
+        # C = S₀ × N(d₁) - K × e^(-r×T) × N(d₂)
+        modelCallOptionPrice = option["assetPrice"] * norm.cdf(d1) - option[
+            "strikePrice"
+        ] * exp(-option["riskFreeInterestRate"] * option["expiration"]) * norm.cdf(d2)
+        return modelCallOptionPrice 
+    if option["optionType"] == "Put":
+        # P = K × e^(-r×T) × N(-d₂) - S₀ × N(-d₁)
+        modelPutOptionPrice = option["strikePrice"] * exp(-option[
+            "riskFreeInterestRate"]*option["expiration"]) * norm.cdf(-d2) - option["assetPrice"] * norm.cdf(-d1)
+        return modelPutOptionPrice
+    else:
+        return None
 
 if __name__ == "__main__":
     # assetPrice: float,
@@ -76,4 +88,5 @@ if __name__ == "__main__":
 
     optionInformation = [31.55, 22.75, 3.5, 0.05, 0.5, "C", 0.02]
     option = returnHashmap(optionInformation)
-    blackScholesCalculator(option)
+    optionPrice = blackScholesCalculator(option)
+    print("your option price is: " + str(optionPrice) + "\n")
