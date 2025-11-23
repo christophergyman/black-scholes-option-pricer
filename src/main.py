@@ -1,3 +1,4 @@
+import yfinance as yf
 from math import log, sqrt, exp
 from scipy.stats import norm
 from time import perf_counter
@@ -79,6 +80,7 @@ def blackScholesCalculator(option: dict) -> float:
     else:
         return None
 
+
 def performanceTest(iteration: int) -> None:
 
     optionInformation = [31.45, 22.75, 3.5, 0.05, 0.5, "C", 0.02]
@@ -87,17 +89,29 @@ def performanceTest(iteration: int) -> None:
     # run 1000 simulations, and print out average
     blackScholesLatencyTimes = []
 
-    for i in range (iteration):
+    for i in range(iteration):
         startTime = perf_counter()
         optionPrice = blackScholesCalculator(option)
         endTime = perf_counter()
-        functionTime = (endTime - startTime) * 1000000 #microseconds
+        functionTime = (endTime - startTime) * 1000000  # microseconds
         blackScholesLatencyTimes.append(functionTime)
 
-    averageRunTime = sum(blackScholesLatencyTimes)/iteration
-    
-    print(f"\n {iteration} Iterations have been run and the average time for black scholes calculation is {averageRunTime} \n")
+    averageRunTime = sum(blackScholesLatencyTimes) / iteration
+
+    print(
+        f"\n {iteration} Iterations have been run and the average time for black scholes calculation is {averageRunTime} \n"
+    )
 
 
 if __name__ == "__main__":
-    performanceTest(100000)
+    # performanceTest(100000)
+
+
+    #Todo
+    # pull in live yfinance data and calculate the black scholes option model price
+    # compare the difference and output to log file.
+
+    ticker = "AAPL"
+    data = yf.download(ticker, start="2025-01-1", end="2025-02-01")
+    print(data.info())
+    print(data.head())
