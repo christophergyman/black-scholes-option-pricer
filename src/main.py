@@ -37,6 +37,7 @@ def returnHashmap(optionInformation: list) -> dict:
 ## D1 standardized measure used in black-scholes 
 def d1Value(option: dict) -> float:
     # d1 = [ln(S/K) + (r + σ²/2) × T] / (σ × √T)
+    d1 = (log(option["assetPrice"]/option["strikePrice"]) + (option["riskFreeInterestRate"]+((option["volatility"]**2)/2)) * option["expiration"])/(option["volatility"]*sqrt(option["expiration"]))
 
     return 0.0
 
