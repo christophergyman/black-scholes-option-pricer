@@ -79,8 +79,7 @@ def blackScholesCalculator(option: dict) -> float:
     else:
         return None
 
-def performanceTest() -> None:
-    iteration = 100000
+def performanceTest(iteration: int) -> None:
 
     optionInformation = [31.45, 22.75, 3.5, 0.05, 0.5, "C", 0.02]
     option = returnHashmap(optionInformation)
@@ -101,11 +100,4 @@ def performanceTest() -> None:
 
 
 if __name__ == "__main__":
-    # assetPrice: float,
-    # strikePrice: float,
-    # expiration: float,
-    # riskFreeInterestRate: float,
-    # volatility: float,
-    # optionType: str,
-    # dividendYield: Union[str, NoneType],
-    performanceTest()
+    performanceTest(100000)
