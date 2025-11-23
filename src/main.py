@@ -1,5 +1,6 @@
 from math import log, sqrt, exp
 from scipy.stats import norm
+from time import perf_counter
 
 
 # convert input to dict
@@ -68,14 +69,36 @@ def blackScholesCalculator(option: dict) -> float:
         modelCallOptionPrice = option["assetPrice"] * norm.cdf(d1) - option[
             "strikePrice"
         ] * exp(-option["riskFreeInterestRate"] * option["expiration"]) * norm.cdf(d2)
-        return modelCallOptionPrice 
+        return modelCallOptionPrice
     if option["optionType"] == "Put":
         # P = K × e^(-r×T) × N(-d₂) - S₀ × N(-d₁)
-        modelPutOptionPrice = option["strikePrice"] * exp(-option[
-            "riskFreeInterestRate"]*option["expiration"]) * norm.cdf(-d2) - option["assetPrice"] * norm.cdf(-d1)
+        modelPutOptionPrice = option["strikePrice"] * exp(
+            -option["riskFreeInterestRate"] * option["expiration"]
+        ) * norm.cdf(-d2) - option["assetPrice"] * norm.cdf(-d1)
         return modelPutOptionPrice
     else:
         return None
+
+def performanceTest() -> None:
+    iteration = 100000
+
+    optionInformation = [31.45, 22.75, 3.5, 0.05, 0.5, "C", 0.02]
+    option = returnHashmap(optionInformation)
+
+    # run 1000 simulations, and print out average
+    blackScholesLatencyTimes = []
+
+    for i in range (iteration):
+        startTime = perf_counter()
+        optionPrice = blackScholesCalculator(option)
+        endTime = perf_counter()
+        functionTime = (endTime - startTime) * 1000000 #microseconds
+        blackScholesLatencyTimes.append(functionTime)
+
+    averageRunTime = sum(blackScholesLatencyTimes)/iteration
+    
+    print(f"\n {iteration} Iterations have been run and the average time for black scholes calculation is {averageRunTime} \n")
+
 
 if __name__ == "__main__":
     # assetPrice: float,
@@ -85,8 +108,4 @@ if __name__ == "__main__":
     # volatility: float,
     # optionType: str,
     # dividendYield: Union[str, NoneType],
-
-    optionInformation = [31.55, 22.75, 3.5, 0.05, 0.5, "C", 0.02]
-    option = returnHashmap(optionInformation)
-    optionPrice = blackScholesCalculator(option)
-    print("your option price is: " + str(optionPrice) + "\n")
+    performanceTest()
