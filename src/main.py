@@ -1,4 +1,5 @@
 import yfinance as yf
+import pandas as pd
 from math import log, sqrt, exp
 from scipy.stats import norm
 from time import perf_counter
@@ -104,14 +105,25 @@ def performanceTest(iteration: int) -> None:
 
 
 if __name__ == "__main__":
-    # performanceTest(100000)
-
-
-    #Todo
+    # Todo
     # pull in live yfinance data and calculate the black scholes option model price
     # compare the difference and output to log file.
 
-    ticker = "AAPL"
-    data = yf.download(ticker, start="2025-01-1", end="2025-02-01")
-    print(data.info())
-    print(data.head())
+    # Query yFinance for ticket data
+    dat = yf.Ticker("AAPL")
+    df = dat.option_chain(dat.options[0]).calls
+
+    # initialise clean empty dataframe
+    cleanedDF = {}
+    columnValues = df.columns.values
+    for i, value in enumerate(columnValues):
+        cleanedDF.update({value: [i]})
+    cleanedDF = pd.DataFrame(cleanedDF)
+
+    print(cleanedDF)
+    print("\n \n")
+    print(dat.option_chain().calls)
+
+    # loop through up to 10 days in options[10], such that the openInterest > 0
+    
+
