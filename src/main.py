@@ -127,15 +127,65 @@ def queryYfinance(ticker: str, optionRange: int)-> pd:
     # drop first row, its only used as formatting
     callsDF.drop(0, inplace=True)
 
+    callsDF['BSM_Model_Value'] = None
 
+    # Get current stock price (needed for assetPrice)
+    current_stock_price = dat.history(period="1d")['Close'].iloc[-1]
 
+    # You'll need to set these values (or fetch them):
+    risk_free_rate = 0.05  # Example: 5% - you may want to fetch this from a source
+    dividend_yield = 0.02  # Example: 2% - you may want to fetch this from ticker info
 
+    # Loop over each row in the dataframe
+    for idx, row in callsDF.iterrows():
+        try:
+            # Extract values from the row
+            strike_price = float(row['strike'])
+            
+            # Calculate time to expiration (in years)
+            # Assuming 'expiration' column exists as a date, convert to days then years
+            expiration_date = pd.to_datetime(row['expiration'])
+            days_to_expiration = (expiration_date - pd.Timestamp.now()).days
+            time_to_expiration = days_to_expiration / 365.0  # Convert to years
+            
+            # Get volatility (implied volatility from the option chain)
+            volatility = float(row['impliedVolatility'])
+            
+            # Option type - since we're only processing calls
+            option_type = "Call"
+            
+            # Build the option information list as expected by returnHashmap
+            option_information = [
+                current_stock_price,      # assetPrice
+                strike_price,             # strikePrice
+                time_to_expiration,       # expiration (in years)
+                risk_free_rate,           # riskFreeInterestRate
+                volatility,               # volatility
+                option_type,              # optionType
+                dividend_yield            # dividentYield
+            ]
+            
+            # Convert to dictionary format
+            option_dict = returnHashmap(option_information)
+            
+            # Calculate Black-Scholes model value
+            bsm_value = blackScholesCalculator(option_dict)
+            
+            # Store the result in the BSM_Model_Value column
+            callsDF.at[idx, 'BSM_Model_Value'] = bsm_value
 
-    # Create new column value stored with NaN
-    # iterate through each row in calls DF
-    # for each row extract required values
-    # build list with required values and send to BSM func
-    # store result in new BSM Model Value column for that row.
+            print("done")
+            
+        except (ValueError, KeyError, TypeError) as e:
+            # Handle any errors (missing values, type conversion issues, etc.)
+            print(f"Error processing row {idx}: {e}")
+            callsDF.at[idx, 'BSM_Model_Value'] = None
+
+    # loop over each row in the dataframe
+    # convert each columns and row into a temporary dict
+    # pass this dictionary to blackScholesCalculator
+    # the return value from the calculator should be inserted into the BSM_Model_value for that row int he dataframe
+
 
 
 if __name__ == "__main__":
