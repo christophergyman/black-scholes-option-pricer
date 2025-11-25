@@ -103,27 +103,38 @@ def performanceTest(iteration: int) -> None:
         f"\n {iteration} Iterations have been run and the average time for black scholes calculation is {averageRunTime} \n"
     )
 
-
-if __name__ == "__main__":
+def queryYfinance(ticker: str, optionRange: int)-> pd:
     # Todo
     # pull in live yfinance data and calculate the black scholes option model price
     # compare the difference and output to log file.
-
     # Query yFinance for ticket data
-    dat = yf.Ticker("AAPL")
+    dat = yf.Ticker(ticker)
     df = dat.option_chain(dat.options[0]).calls
 
     # initialise clean empty dataframe
-    cleanedDF = {}
+    callsDF = {}
     columnValues = df.columns.values
     for i, value in enumerate(columnValues):
-        cleanedDF.update({value: [i]})
-    cleanedDF = pd.DataFrame(cleanedDF)
+        callsDF.update({value: [i]})
+    callsDF = pd.DataFrame(callsDF)
 
-    print(cleanedDF)
-    print("\n \n")
-    print(dat.option_chain().calls)
+    # filter and concat all openInterest > 0 calls
+    for i in range(optionRange):
+        filteredDF = dat.option_chain(dat.options[i]).calls
+        filteredDF = filteredDF[filteredDF['openInterest'] > 0]
+        callsDF = pd.concat([callsDF, filteredDF])
 
-    # loop through up to 10 days in options[10], such that the openInterest > 0
-    
+    # drop first row, its only used as formatting
+    callsDF.drop(0, inplace=True)
 
+
+
+    # Create new column value stored with NaN
+    # iterate through each row in calls DF
+    # for each row extract required values
+    # build list with required values and send to BSM func
+    # store result in new BSM Model Value column for that row.
+
+
+if __name__ == "__main__":
+    queryYfinance("AAPL", 20)
