@@ -129,6 +129,8 @@ def queryYfinance(ticker: str, optionRange: int)-> pd:
 
 
 
+
+
     # Create new column value stored with NaN
     # iterate through each row in calls DF
     # for each row extract required values
